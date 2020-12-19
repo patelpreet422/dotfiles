@@ -10,7 +10,7 @@ bindkey -v
 fpath+=~/.zfunc
 
 # The following lines were added by compinstall
-zstyle :compinstall filename '/home/preet/.zshrc'
+zstyle :compinstall filename "$HOME/.zshrc"
 
 autoload -Uz compinit
 compinit
@@ -24,9 +24,9 @@ bashcompinit
 eval "$(register-python-argcomplete pipx)"
 
 # export
-export PATH="$PATH:/home/preet/go/bin"
-export PATH="$PATH:/home/preet/.yarn/bin"
-export PATH="$PATH:/home/preet/bear/bin:/home/preet/bear/libexec:/home/preet/bear/libexec/wrapper.d"
+export PATH="$PATH:$HOME/go/bin"
+export PATH="$PATH:$HOME/.yarn/bin"
+export PATH="$PATH:$HOME/bear/bin:$HOME/bear/libexec:$HOME/bear/libexec/wrapper.d"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 MANROFFOPT="-c"
 export FZF_DEFAULT_COMMAND="fd"
@@ -52,4 +52,4 @@ zplug load
 
 # alias
 alias ls="exa --git"
-a
+alias tree="exa -T"
