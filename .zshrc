@@ -17,14 +17,16 @@ if type brew &>/dev/null; then
 fi
 
 # bash completion
-# autoload -U bashcompinit
-# bashcompinit
+autoload -U bashcompinit
+bashcompinit
 
 # export
 export PATH="$PATH:$HOME/go/bin"
+export PATH="$PATH:$HOME/bin"
+export PATH="$PATH:$HOME/flutter/bin"
 export PATH="$PATH:$HOME/.yarn/bin"
 export PATH="$PATH:$HOME/bear/bin:$HOME/bear/libexec:$HOME/bear/libexec/wrapper.d"
-export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+export MANPAGER="sh -c 'col -bx | bat -l man -p --theme Monokai\ Extended\ Bright'"
 MANROFFOPT="-c"
 export FZF_DEFAULT_COMMAND="fd"
 
@@ -48,7 +50,17 @@ zplug load
 
 # end zplug
 
+# helm completion
+helm completion zsh > "${fpath[1]}/_helm"
+
+# kind completion
+kind completion zsh > "${fpath[1]}/_kind"
+
+# k90s completion
+k9s completion zsh > "${fpath[1]}/_k9s"
+
 # alias
+alias kk="kubectl"
 alias ls="exa --git"
 alias tree="exa -T"
 alias gg="git log --oneline --graph --all"
@@ -62,20 +74,8 @@ export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 
-export MANPAGER="sh -c 'col -bx | bat -l man -p'"
-MANROFFOPT="-c"
+export MANROFFOPT="-c"
 export FZF_ALT_C_COMMAND="fd"
-
-export LC_CTYPE="en_US.UTF-8"
-export LC_ALL="en_US.UTF-8"
-
-# Generated for envman. Do not edit.
-[ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 # Preview file content using bat (https://github.com/sharkdp/bat)
@@ -94,9 +94,20 @@ export FZF_CTRL_R_OPTS="
 zstyle ':completion:*' menu select
 zmodload zsh/complist
 
-
 # use the vi navigation keys in menu completion
 bindkey -M menuselect 'h' vi-backward-char
 bindkey -M menuselect 'k' vi-up-line-or-history
 bindkey -M menuselect 'l' vi-forward-char
 bindkey -M menuselect 'j' vi-down-line-or-history
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+export PATH="/opt/homebrew/opt/node@18/bin:$PATH"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
