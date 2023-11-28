@@ -30,6 +30,9 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p --theme Monokai\ Extended\ Brigh
 MANROFFOPT="-c"
 export FZF_DEFAULT_COMMAND="fd"
 
+# krew kubectl plugin
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+  
 # prompt
 eval "$(starship init zsh)"
 
@@ -107,6 +110,10 @@ export NVM_DIR="$HOME/.nvm"
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 export PATH="/opt/homebrew/opt/node@18/bin:$PATH"
+
+# bun completions
+[ -s "/Users/kmbl277064/.bun/_bun" ] && source "/Users/kmbl277064/.bun/_bun"
+
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
