@@ -62,6 +62,9 @@ kind completion zsh > "${fpath[1]}/_kind"
 # k90s completion
 k9s completion zsh > "${fpath[1]}/_k9s"
 
+# opa completion
+opa completion zsh > "${fpath[1]}/_opa"
+
 # alias
 alias kk="kubectl"
 alias ls="exa --git"
