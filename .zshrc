@@ -22,6 +22,7 @@ bashcompinit
 
 # export
 export PATH="$PATH:$HOME/go/bin"
+export PATH="$PATH:$HOME/.local/bin"
 export PATH="$PATH:$HOME/bin"
 export PATH="$PATH:$HOME/flutter/bin"
 export PATH="$PATH:$HOME/.yarn/bin"
@@ -64,6 +65,9 @@ k9s completion zsh > "${fpath[1]}/_k9s"
 
 # opa completion
 opa completion zsh > "${fpath[1]}/_opa"
+
+# pipx completion
+eval "$(register-python-argcomplete pipx)"
 
 # alias
 alias kk="kubectl"
