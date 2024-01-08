@@ -306,7 +306,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- see :help lualine
 require('lualine').setup {
   sections = {
-    lualine_a = {'mode', 'buffer'},
+    lualine_a = {'mode', 'buffers'},
   }
 }
 
