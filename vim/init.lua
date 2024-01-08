@@ -168,12 +168,12 @@ require('lazy').setup({
     -- See `:help lualine.txt`
     opts = {
       options = {
-        icons_enabled = false,
+        icons_enabled = true,
         theme = 'onedark',
         component_separators = '|',
         section_separators = '',
       },
-    },
+    }
   },
 
   {
@@ -302,10 +302,16 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   pattern = '*',
 })
 
+-- [[ Configure lualine ]]
+-- see :help lualine
+require('lualine').setup {
+  sections = {
+    lualine_a = {'mode', 'buffer'},
+  }
+}
+
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
-local fb_actions = require "telescope._extensions.file_browser.actions"
-
 require('telescope').setup {
   defaults = {
     mappings = {
