@@ -2,7 +2,7 @@
 
 =====================================================================
 ==================== READ THIS BEFORE CONTINUING ====================
-=====================================================================
+=====================================================================mason-lsp
 
 Kickstart.nvim is *not* a distribution.
 
@@ -43,6 +43,23 @@ P.S. You can delete this when you're done too. It's your config now :)
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+
+-- lua helper functions
+-- print a table
+P = function(v)
+  print(vim.inspect(v))
+  return v
+end
+
+-- nvim helper functions
+
+local nmap_desc = function(keys, func, desc, prefix)
+  if desc then
+    desc = prefix .. desc
+  end
+
+  vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
+end
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    https://github.com/folke/lazy.nvim
@@ -109,7 +126,221 @@ require('lazy').setup({
 
       -- Adds a number of user-friendly snippets
       'rafamadriz/friendly-snippets',
+
+      -- Adds file path completion
+      '/hrsh7th/cmp-path'
     },
+  },
+
+  {
+    -- we use mason to install jdtls but in nvim-lspconfig we disable setting up this server
+    -- we use nvim-jdtls because it has more features compared to using nvim-lspconfig, jdtls config
+    -- see this https://github.com/neovim/nvim-lspconfig/blob/7eed8b2150192e5ad05e1886fdf133493ddf2928/lua/lspconfig/server_configurations/jdtls.lua#L131C74-L131C116
+    --
+    "mfussenegger/nvim-jdtls",
+    dependencies = { "mfussenegger/nvim-dap" },
+    event = "VeryLazy",
+    config = function()
+      -- Autocmd
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "java" },
+        callback = function()
+          -- LSP capabilities
+          local jdtls = require "jdtls"
+
+          local capabilities = vim.lsp.protocol.make_client_capabilities()
+          capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+
+          local extendedClientCapabilities = jdtls.extendedClientCapabilities
+          extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
+
+          local workspace_dir = require("lspconfig.server_configurations.jdtls").default_config.init_options.workspace
+          local launcher = vim.fn.expand(
+            "~/.local/share/nvim/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_1.6.600.v20231106-1826.jar")
+          local lombok_jar = vim.fn.expand("~/.local/share/nvim/mason/packages/jdtls/lombok.jar")
+
+          local os_config = vim.fn.expand("~/.local/share/nvim/mason/packages/jdtls/config_mac_arm")
+
+          if vim.fn.has("linux") == 1 then
+            os_config = vim.fn.expand("~/.local/share/nvim/mason/packages/jdtls/config_linux")
+          end
+
+          local function get_bundles()
+            local mason_registry = require "mason-registry"
+            local java_debug = mason_registry.get_package "java-debug-adapter"
+            local java_test = mason_registry.get_package "java-test"
+            local java_debug_path = java_debug:get_install_path()
+            local java_test_path = java_test:get_install_path()
+            local bundles = {}
+            vim.list_extend(bundles,
+              vim.split(vim.fn.glob(java_debug_path .. "/extension/server/com.microsoft.java.debug.plugin-*.jar"), "\n"))
+            vim.list_extend(bundles, vim.split(vim.fn.glob(java_test_path .. "/extension/server/*.jar"), "\n"))
+            return bundles
+          end
+
+          local bundles = get_bundles()
+
+          local on_attach = function(_, bufnr)
+            vim.lsp.codelens.refresh()
+            jdtls.setup_dap { hotcodereplace = "auto" }
+            require("jdtls.dap").setup_dap_main_class_configs()
+
+            local map = function(mode, lhs, rhs, desc)
+              if desc then
+                desc = desc
+              end
+              vim.keymap.set(mode, lhs, rhs, { silent = true, desc = desc, buffer = bufnr, noremap = true })
+            end
+
+            -- Register keymappings
+            local wk = require "which-key"
+            local keys = { mode = { "n", "v" }, ["<leader>lj"] = { name = "+Java" } }
+            wk.register(keys)
+
+            map("n", "<leader>ljo", jdtls.organize_imports, "Organize Imports")
+            map("n", "<leader>ljv", jdtls.extract_variable, "Extract Variable")
+            map("n", "<leader>ljc", jdtls.extract_constant, "Extract Constant")
+            map("n", "<leader>ljt", jdtls.test_nearest_method, "Test Nearest Method")
+            map("n", "<leader>ljT", jdtls.test_class, "Test Class")
+            map("n", "<leader>lju", "<cmd>JdtUpdateConfig<cr>", "Update Config")
+            map("v", "<leader>ljm", "<esc><Cmd>lua require('jdtls').extract_method(true)<cr>", "Extract Method")
+
+
+            map('n', '<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+            map('n', '<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+
+            map('n', 'gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+            map('n', 'gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+            map('n', 'gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
+            map('n', '<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
+            map('n', '<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
+            map('n', '<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+
+            -- See `:help K` for why this keymap
+            map('n', 'K', vim.lsp.buf.hover, 'Hover Documentation')
+            map('n', '<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+
+            -- Lesser used LSP functionality
+            map('n', 'gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+            map('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
+            map('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
+            map('n', '<leader>wl', function()
+              print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+            end, '[W]orkspace [L]ist Folders')
+
+            -- Create a command `:Format` local to the LSP buffer
+            vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
+              vim.lsp.buf.format()
+            end, { desc = 'Format current buffer with LSP' })
+
+
+            vim.api.nvim_create_autocmd("BufWritePost", {
+              pattern = { "*.java" },
+              callback = function()
+                local _, _ = pcall(vim.lsp.codelens.refresh)
+              end,
+            })
+          end
+
+          local config = {
+            cmd = {
+              "java",
+              "-Declipse.application=org.eclipse.jdt.ls.core.id1",
+              "-Dosgi.bundles.defaultStartLevel=4",
+              "-Declipse.product=org.eclipse.jdt.ls.core.product",
+              "-Dlog.protocol=true",
+              "-Dlog.level=ALL",
+              "-Xms1g",
+              "--add-modules=ALL-SYSTEM",
+              "--add-opens",
+              "java.base/java.util=ALL-UNNAMED",
+              "--add-opens",
+              "java.base/java.lang=ALL-UNNAMED",
+              "-javaagent:" .. lombok_jar,
+              "-jar",
+              launcher,
+              "-configuration",
+              os_config,
+              "-data",
+              workspace_dir,
+            },
+            root_dir = require("jdtls.setup").find_root { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" },
+            capabilities = capabilities,
+            on_attach = on_attach,
+
+            settings = {
+              java = {
+                autobuild = { enabled = false },
+                signatureHelp = { enabled = true },
+                contentProvider = { preferred = "fernflower" },
+                saveActions = {
+                  organizeImports = true,
+                },
+                sources = {
+                  organizeImports = {
+                    starThreshold = 9999,
+                    staticStarThreshold = 9999,
+                  },
+                },
+                codeGeneration = {
+                  toString = {
+                    template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}",
+                  },
+                  hashCodeEquals = {
+                    useJava7Objects = true,
+                  },
+                  useBlocks = true,
+                },
+                eclipse = {
+                  downloadSources = true,
+                },
+                configuration = {
+                  updateBuildConfiguration = "interactive",
+                  -- NOTE: Add the available runtimes here
+                  -- https://github.com/eclipse/eclipse.jdt.ls/wiki/Running-the-JAVA-LS-server-from-the-command-line#initialize-request
+                  -- runtimes = {
+                  --   {
+                  --     name = "JavaSE-18",
+                  path = vim.fn.expand("~/.sdkman/candidates/java/current"),
+                  --   },
+                  -- },
+                },
+                maven = {
+                  downloadSources = true,
+                },
+                implementationsCodeLens = {
+                  enabled = true,
+                },
+                referencesCodeLens = {
+                  enabled = true,
+                },
+                references = {
+                  includeDecompiledSources = true,
+                },
+                inlayHints = {
+                  parameterNames = {
+                    enabled = "all", -- literals, all, none
+                  },
+                },
+                format = {
+                  enabled = true,
+                  settings = {
+                    url = vim.fn.expand("~/kotak/Corporate-Cards-service/google-code-style.xml"),
+                    profile = "GoogleStyle",
+                  },
+                }
+              },
+            },
+            init_options = {
+              bundles = bundles,
+              extendedClientCapabilities = extendedClientCapabilities,
+            },
+          }
+
+          require("jdtls").start_or_attach(config)
+        end
+      })
+    end,
   },
 
   -- Useful plugin to show you pending keybinds.
@@ -216,23 +447,28 @@ require('lazy').setup({
     dependencies = {
       'nvim-treesitter/nvim-treesitter-textobjects',
     },
+    opts = function(_, opts)
+      opts.ensure_installed = opts.ensure_installed or {}
+      vim.list_extend(opts.ensure_installed, { "java", "javascript", "cpp", "lua", "typescript" })
+    end,
     build = ':TSUpdate',
   },
 
-  -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
-  --       These are some example plugins that I've included in the kickstart repository.
-  --       Uncomment any of the lines below to enable them.
-  -- require 'kickstart.plugins.autoformat',
-  -- require 'kickstart.plugins.debug',
+})
 
-  -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --    You can use this folder to prevent any conflicts with this init.lua if you're interested in keeping
-  --    up-to-date with whatever is in the kickstart repo.
-  --    Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  --
-  --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
-  -- { import = 'custom.plugins' },
-}, {})
+-- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
+--       These are some example plugins that I've included in the kickstart repository.
+--       Uncomment any of the lines below to enable them.
+-- require 'kickstart.plugins.autoformat',
+-- require 'kickstart.plugins.debug',
+
+-- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
+--    You can use this folder to prevent any conflicts with this init.lua if you're interested in keeping
+--    up-to-date with whatever is in the kickstart repo.
+--    Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
+--
+--    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
+-- { import = 'custom.plugins' },
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -306,8 +542,8 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- see :help lualine
 require('lualine').setup {
   sections = {
-    lualine_a = {'mode', 'buffers'},
-  }
+    lualine_a = { 'mode', 'buffers' },
+  },
 }
 
 -- [[ Configure Telescope ]]
@@ -478,8 +714,53 @@ vim.defer_fn(function()
   }
 end, 0)
 
+-- document existing key chains
+require('which-key').register {
+  ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
+  ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
+  ['<leader>g'] = { name = '[G]it', _ = 'which_key_ignore' },
+  ['<leader>h'] = { name = 'More git', _ = 'which_key_ignore' },
+  ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
+  ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
+  ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
+}
+
 -- [[ Configure LSP ]]
---  This function gets run when an LSP connects to a particular buffer.
+
+-- mason-lspconfig requires that these setup functions are called in this order
+-- before setting up the servers.
+require('mason').setup()
+require('mason-lspconfig').setup()
+
+-- Setup generic capabilities to all the lsp clients
+
+-- Enable the following language servers
+--  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
+--
+--  Add any additional override configuration in the following tables. They will be passed to
+--  the `settings` field of the server config. You must look up that documentation yourself.
+--
+--  If you want to override the default filetypes that your language server will attach to you can
+--  define the property 'filetypes' to the map in question.
+local servers = {
+  -- clangd = {},
+  -- gopls = {},
+  -- pyright = {},
+  -- rust_analyzer = {},
+  -- tsserver = {},
+  -- html = { filetypes = { 'html', 'twig', 'hbs'} },
+
+  lua_ls = {
+    Lua = {
+      workspace = { checkThirdParty = false },
+      telemetry = { enable = false },
+    },
+  },
+
+  jdtls = {}
+}
+
+-- This function gets run when an LSP connects to a particular buffer.
 local on_attach = function(_, bufnr)
   -- NOTE: Remember that lua is a real programming language, and as such it is possible
   -- to define small helper and utility functions so you don't have to repeat yourself
@@ -488,11 +769,7 @@ local on_attach = function(_, bufnr)
   -- In this case, we create a function that lets us more easily define mappings specific
   -- for LSP related items. It sets the mode, buffer and description for us each time.
   local nmap = function(keys, func, desc)
-    if desc then
-      desc = 'LSP: ' .. desc
-    end
-
-    vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
+    nmap_desc(keys, func, desc, "LSP: ")
   end
 
   nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
@@ -523,52 +800,12 @@ local on_attach = function(_, bufnr)
   end, { desc = 'Format current buffer with LSP' })
 end
 
--- document existing key chains
-require('which-key').register {
-  ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-  ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-  ['<leader>g'] = { name = '[G]it', _ = 'which_key_ignore' },
-  ['<leader>h'] = { name = 'More git', _ = 'which_key_ignore' },
-  ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-  ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-  ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-}
-
--- mason-lspconfig requires that these setup functions are called in this order
--- before setting up the servers.
-require('mason').setup()
-require('mason-lspconfig').setup()
-
--- Enable the following language servers
---  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
---
---  Add any additional override configuration in the following tables. They will be passed to
---  the `settings` field of the server config. You must look up that documentation yourself.
---
---  If you want to override the default filetypes that your language server will attach to you can
---  define the property 'filetypes' to the map in question.
-local servers = {
-  -- clangd = {},
-  -- gopls = {},
-  -- pyright = {},
-  -- rust_analyzer = {},
-  -- tsserver = {},
-  -- html = { filetypes = { 'html', 'twig', 'hbs'} },
-
-  lua_ls = {
-    Lua = {
-      workspace = { checkThirdParty = false },
-      telemetry = { enable = false },
-    },
-  },
-}
-
--- Setup neovim lua configuration
-require('neodev').setup()
-
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+local get_generic_lsp_capabilites = function()
+  local capabilities = vim.lsp.protocol.make_client_capabilities()
+  capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+  return capabilities
+end
 
 -- Ensure the servers above are installed
 local mason_lspconfig = require 'mason-lspconfig'
@@ -580,11 +817,14 @@ mason_lspconfig.setup {
 mason_lspconfig.setup_handlers {
   function(server_name)
     require('lspconfig')[server_name].setup {
-      capabilities = capabilities,
+      capabilities = get_generic_lsp_capabilites(),
       on_attach = on_attach,
       settings = servers[server_name],
       filetypes = (servers[server_name] or {}).filetypes,
     }
+  end,
+  ["jdtls"] = function()
+    return true
   end,
 }
 
@@ -636,8 +876,12 @@ cmp.setup {
   sources = {
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
+    { name = 'path' },
   },
 }
+
+-- Setup neovim lua configuration
+require('neodev').setup()
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
