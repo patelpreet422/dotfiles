@@ -133,7 +133,7 @@ require('lazy').setup({
 
           local bundles = get_bundles()
 
-          local on_attach = function(_, bufnr)
+          local on_buffer_attach_to_jdtls = function(_, bufnr)
             vim.lsp.codelens.refresh()
             jdtls.setup_dap { hotcodereplace = "auto" }
             require("jdtls.dap").setup_dap_main_class_configs()
@@ -219,8 +219,9 @@ require('lazy').setup({
             },
             root_dir = require("jdtls.setup").find_root { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" },
             capabilities = capabilities,
-            on_attach = on_attach,
-
+            on_attach = on_buffer_attach_to_jdtls,
+            filetypes = { "java" },
+            autostart = true,
             settings = {
               java = {
                 autobuild = { enabled = false },

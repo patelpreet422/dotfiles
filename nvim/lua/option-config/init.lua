@@ -46,3 +46,4 @@ vim.o.completeopt = 'menuone,noselect'
 vim.o.termguicolors = true
 
 
+vim.o.title = true

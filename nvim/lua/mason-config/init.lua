@@ -38,7 +38,7 @@ local servers = {
 }
 
 -- This function gets run when an LSP connects to a particular buffer.
-local on_attach = function(_, bufnr)
+local on_buffer_attach_to_lsp_server = function(_, bufnr)
 	-- NOTE: Remember that lua is a real programming language, and as such it is possible
 	-- to define small helper and utility functions so you don't have to repeat yourself
 	-- many times.
@@ -99,12 +99,31 @@ mason_lspconfig.setup_handlers {
 	function(server_name)
 		require('lspconfig')[server_name].setup {
 			capabilities = get_generic_lsp_capabilites(),
-			on_attach = on_attach,
+			on_attach = on_buffer_attach_to_lsp_server,
 			settings = servers[server_name],
 			filetypes = (servers[server_name] or {}).filetypes,
 		}
 	end,
-	["jdtls"] = function()
-		return true
+	['jdtls'] = function()
+	end,
+	['lua_ls'] = function()
+		require('lspconfig').lua_ls.setup {
+			settings = {
+				Lua = {
+					runtime = {
+						-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+						version = 'LuaJIT',
+					},
+					workspace = {
+						-- Make the server aware of Neovim runtime files
+						library = vim.api.nvim_get_runtime_file('', true),
+					},
+					-- Do not send telemetry data containing a randomized but unique identifier
+					telemetry = {
+						enable = false,
+					},
+				},
+			}
+		}
 	end,
 }
