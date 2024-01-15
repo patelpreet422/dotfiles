@@ -124,6 +124,7 @@ local config = {
   autostart = true,
   settings = {
     java = {
+      home = vim.fn.expand('~/.sdkman/candidates/java/current'),
       autobuild = { enabled = false },
       signatureHelp = { enabled = true },
       contentProvider = { preferred = "fernflower" },

@@ -22,10 +22,11 @@ require('telescope').setup {
 
 
 -- Enable telescope fzf native, if installed
-pcall(require('telescope').load_extension, 'fzf')
+require('telescope').load_extension('fzf')
 -- Enable telescope file_browser extension, if installed
-pcall(require('telescope').load_extension, 'file_browser')
-
+require('telescope').load_extension('file_browser')
+-- Enble telescope ui select for vim.ui.select
+require('telescope').load_extension('ui-select')
 
 vim.api.nvim_set_keymap(
   "n",
