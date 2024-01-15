@@ -152,12 +152,12 @@ local config = {
         updateBuildConfiguration = "interactive",
         -- NOTE: Add the available runtimes here
         -- https://github.com/eclipse/eclipse.jdt.ls/wiki/Running-the-JAVA-LS-server-from-the-command-line#initialize-request
-        -- runtimes = {
-        --   {
-        --     name = "JavaSE-18",
-        path = vim.fn.expand("~/.sdkman/candidates/java/current"),
-        --   },
-        -- },
+        runtimes = {
+          {
+            name = "JavaSE-17",
+            path = vim.fn.expand("~/.sdkman/candidates/java/17.0.9-amzn"),
+          },
+        },
       },
       maven = {
         downloadSources = true,
