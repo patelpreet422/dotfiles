@@ -340,7 +340,7 @@ require('lazy').setup({
                 format = {
                   enabled = true,
                   settings = {
-                    url = vim.fn.expand("~/kotak/Corporate-Cards-service/google-code-style.xml"),
+                    url = vim.fn.expand("~/google-code-style.xml"),
                     profile = "GoogleStyle",
                   },
                 }
