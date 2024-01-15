@@ -28,13 +28,16 @@ local servers = {
 	-- html = { filetypes = { 'html', 'twig', 'hbs'} },
 
 	lua_ls = {
+		filetypes = { 'lua' },
 		Lua = {
 			workspace = { checkThirdParty = false },
 			telemetry = { enable = false },
 		},
 	},
 
-	jdtls = {},
+	jdtls = {
+		filetypes = { 'java' }
+	},
 }
 
 -- This function gets run when an LSP connects to a particular buffer.
@@ -108,6 +111,8 @@ mason_lspconfig.setup_handlers {
 	end,
 	['lua_ls'] = function()
 		require('lspconfig').lua_ls.setup {
+			capabilities = get_generic_lsp_capabilites(),
+			on_attach = on_buffer_attach_to_lsp_server,
 			settings = {
 				Lua = {
 					runtime = {
