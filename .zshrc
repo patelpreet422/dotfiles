@@ -9,13 +9,16 @@ setopt autocd extendedglob
 fpath+=~/.zfunc
 
 if type brew &>/dev/null; then
+  # brew install zsh-completions
   FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
   FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
   autoload -Uz compinit
   compinit
 fi
 
-# bash completion
+# enable bash completion in zsh
+# brew install bash-completion@2 to get bash completions scripts and use them in zsh
+# usually not required but can use bash-completions so use it if you really need it
 autoload -U bashcompinit
 bashcompinit
 
@@ -54,16 +57,19 @@ zplug load
 # end zplug
 
 # helm completion
-helm completion zsh > "${fpath[1]}/_helm"
+# helm completion zsh > "~/.zfunc/_helm"
 
 # kind completion
-kind completion zsh > "${fpath[1]}/_kind"
+# kind completion zsh > "$~/.zfunc/_kind"
 
 # k90s completion
-k9s completion zsh > "${fpath[1]}/_k9s"
+# k9s completion zsh > "~/.zfunc/_k9s"
 
 # opa completion
-opa completion zsh > "${fpath[1]}/_opa"
+# opa completion zsh > "~/.zfunc/_opa"
+
+# aws completion
+complete -C '/usr/local/bin/aws_completer' aws
 
 # pipx completion
 eval "$(register-python-argcomplete pipx)"
