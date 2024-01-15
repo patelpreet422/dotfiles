@@ -70,6 +70,7 @@ zplug load
 
 # aws completion
 complete -C '/usr/local/bin/aws_completer' aws
+complete -C '/usr/local/bin/aws_completer' awspersonal
 
 # pipx completion
 eval "$(register-python-argcomplete pipx)"
