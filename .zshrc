@@ -32,7 +32,7 @@ export FZF_DEFAULT_COMMAND="fd"
 
 # krew kubectl plugin
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
-  
+
 # prompt
 eval "$(starship init zsh)"
 
@@ -69,18 +69,18 @@ opa completion zsh > "${fpath[1]}/_opa"
 eval "$(register-python-argcomplete pipx)"
 
 # alias
+alias awspersonal="aws --profile personal --no-verify-ssl"
 alias kk="kubectl"
+alias http="http --verify=no"
 alias ls="exa --git"
 alias tree="exa -T"
 alias gg="git log --oneline --graph --all"
-alias gga="git add --all"
-alias ggs="git status"
+alias ga="git add --all"
+alias gco="git checkout"
+alias gcm="git commit -m"
+alias gss="git status"
 alias gb="git branch"
-alias grl="git remote show"
-
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+alias gr="git remote"
 
 
 export MANROFFOPT="-c"
@@ -118,9 +118,12 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 export PATH="/opt/homebrew/opt/node@18/bin:$PATH"
 
 # bun completions
-[ -s "/Users/kmbl277064/.bun/_bun" ] && source "/Users/kmbl277064/.bun/_bun"
-
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
