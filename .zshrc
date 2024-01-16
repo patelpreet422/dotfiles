@@ -39,6 +39,9 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 # prompt
 eval "$(starship init zsh)"
 
+# zoxide
+eval "$(zoxide init zsh)"
+
 # zplug 
 source ~/.zplug/init.zsh
 zplug "zsh-users/zsh-autosuggestions"
@@ -76,6 +79,7 @@ complete -C '/usr/local/bin/aws_completer' awspersonal
 eval "$(register-python-argcomplete pipx)"
 
 # alias
+alias sz="source ~/.zshrc"
 alias awspersonal="aws --profile personal --no-verify-ssl"
 alias kk="kubectl"
 alias http="http --verify=no"

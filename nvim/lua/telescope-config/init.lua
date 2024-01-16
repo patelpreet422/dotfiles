@@ -35,6 +35,8 @@ vim.api.nvim_set_keymap(
   { noremap = true }
 )
 
+-- Enable telescope zoxide integration if zoxide is installed
+require("telescope").load_extension('zoxide')
 
 -- Telescope live_grep in git root
 -- Function to find the git root directory based on the current buffer's path

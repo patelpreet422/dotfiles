@@ -17,3 +17,7 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 
 -- Keymaps for NvimTree 
 vim.keymap.set('n', '<leader>b', ":NvimTreeToggle<CR>", { desc = 'Toggle directory tree' })
+
+-- Telescope keymaps
+-- Keymap to change directory using zoxide
+vim.keymap.set('n', '<leader>cd', ':Telescope zoxide list<CR>', { desc = 'Change directory using zoxide' })
