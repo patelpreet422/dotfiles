@@ -28,6 +28,12 @@ require('lazy').setup({
   'tpope/vim-rhubarb',
   'junegunn/gv.vim',
 
+  -- Codeium free AI completion
+  {
+    'Exafunction/codeium.vim',
+    event = 'BufEnter'
+  },
+
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
 

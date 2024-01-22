@@ -26,6 +26,12 @@ local servers = {
 	-- rust_analyzer = {},
 	-- tsserver = {},
 	-- html = { filetypes = { 'html', 'twig', 'hbs'} },
+	lemminx = {
+	},
+
+	jsonls = {
+		filetypes = { 'json', 'jsonc' }
+	},
 
 	lua_ls = {
 		filetypes = { 'lua' },
