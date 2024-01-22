@@ -79,6 +79,8 @@ complete -C '/usr/local/bin/aws_completer' awspersonal
 eval "$(register-python-argcomplete pipx)"
 
 # alias
+alias l="lazygit"
+alias n="nvim"
 alias sz="source ~/.zshrc"
 alias awspersonal="aws --profile personal --no-verify-ssl"
 alias kk="kubectl"

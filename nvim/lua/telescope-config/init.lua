@@ -35,6 +35,13 @@ vim.api.nvim_set_keymap(
   { noremap = true }
 )
 
+vim.api.nvim_set_keymap(
+  "n",
+  "<space>kmp",
+  ":Telescope keymaps<CR>",
+  { noremap = true }
+)
+
 -- Enable telescope zoxide integration if zoxide is installed
 require("telescope").load_extension('zoxide')
 
