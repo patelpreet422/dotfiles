@@ -72,8 +72,14 @@ zplug load
 # opa completion zsh > "~/.zfunc/_opa"
 
 # aws completion
-complete -C '/usr/local/bin/aws_completer' aws
-complete -C '/usr/local/bin/aws_completer' awspersonal
+if [[ -e "$(brew --prefix)/bin/aws_completer" ]] then
+  complete -C "$(brew --prefix)/bin/aws_completer" aws
+  complete -C "$(brew --prefix)/bin/aws_completer" awspersonal
+elif [[ -e "/usr/local/bin/aws_completer" ]] then
+  complete -C '/usr/local/bin/aws_completer' aws
+  complete -C '/usr/local/bin/aws_completer' awspersonal
+fi
+
 
 # pipx completion
 eval "$(register-python-argcomplete pipx)"
