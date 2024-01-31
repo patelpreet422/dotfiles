@@ -81,6 +81,14 @@ end
 
 vim.api.nvim_create_user_command('LiveGrepGitRoot', live_grep_git_root, {})
 
+local function search_entire_man_pages()
+  require('telescope.builtin').man_pages({
+    sections = { "ALL" },
+  })
+end
+
+vim.api.nvim_create_user_command('SearchEntireManPages', search_entire_man_pages, {})
+
 -- See `:help telescope.builtin`
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
 vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
@@ -103,6 +111,7 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 vim.keymap.set('n', '<leader>ss', require('telescope.builtin').treesitter, { desc = '[S]earch [S]ymbols' })
 
 
+vim.keymap.set('n', '<leader>sm', ':SearchEntireManPages<CR>', { desc = '[S]earch [M]an Pages' })
 
 vim.keymap.set('n', '<leader>gb', require('telescope.builtin').git_branches, { desc = '[G]it [B]ranches' })
 vim.keymap.set('n', '<leader>gc', require('telescope.builtin').git_commits, { desc = '[G]it [C]ommits' })
