@@ -60,16 +60,20 @@ zplug load
 # end zplug
 
 # helm completion
-# helm completion zsh > "~/.zfunc/_helm"
+[ ! -e "~/.zfunc/_helm" ] &&  helm completion zsh > ~/.zfunc/_helm
+# helm completion zsh > ~/.zfunc/_helm
 
 # kind completion
-# kind completion zsh > "$~/.zfunc/_kind"
+[ ! -e "~/.zfunc/_kind" ] &&  kind completion zsh > ~/.zfunc/_kind
+# kind completion zsh > $~/.zfunc/_kind
 
-# k90s completion
-# k9s completion zsh > "~/.zfunc/_k9s"
+# k9s completion
+[ ! -e "~/.zfunc/_k9s" ] &&  k9s completion zsh > ~/.zfunc/_k9s
+# k9s completion zsh > ~/.zfunc/_k9s
 
 # opa completion
-# opa completion zsh > "~/.zfunc/_opa"
+[ ! -e "~/.zfunc/_opa" ] &&  opa completion zsh > ~/.zfunc/_opa
+# opa completion zsh > ~/.zfunc/_opa
 
 # aws completion
 if [[ -e "$(brew --prefix)/bin/aws_completer" ]] then
