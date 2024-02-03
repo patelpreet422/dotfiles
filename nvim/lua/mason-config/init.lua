@@ -3,13 +3,6 @@
 -- mason-lspconfig requires that these setup functions are called in this order
 -- before setting up the servers.
 require('mason').setup()
-require('mason-lspconfig').setup()
-
-
-
--- nvim helper functions
-
--- Setup generic capabilities to all the lsp clients
 
 -- Enable the following language servers
 --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -26,8 +19,7 @@ local servers = {
 	-- rust_analyzer = {},
 	-- tsserver = {},
 	-- html = { filetypes = { 'html', 'twig', 'hbs'} },
-	lemminx = {
-	},
+	lemminx = {},
 
 	jsonls = {
 		filetypes = { 'json', 'jsonc' }
@@ -97,44 +89,40 @@ local get_generic_lsp_capabilites = function()
 	return capabilities
 end
 
--- Ensure the servers above are installed
-local mason_lspconfig = require 'mason-lspconfig'
-
-mason_lspconfig.setup {
+require('mason-lspconfig').setup {
 	ensure_installed = vim.tbl_keys(servers),
-}
-
-mason_lspconfig.setup_handlers {
-	function(server_name)
-		require('lspconfig')[server_name].setup {
-			capabilities = get_generic_lsp_capabilites(),
-			on_attach = on_buffer_attach_to_lsp_server,
-			settings = servers[server_name],
-			filetypes = (servers[server_name] or {}).filetypes,
-		}
-	end,
-	['jdtls'] = function()
-	end,
-	['lua_ls'] = function()
-		require('lspconfig').lua_ls.setup {
-			capabilities = get_generic_lsp_capabilites(),
-			on_attach = on_buffer_attach_to_lsp_server,
-			settings = {
-				Lua = {
-					runtime = {
-						-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-						version = 'LuaJIT',
-					},
-					workspace = {
-						-- Make the server aware of Neovim runtime files
-						library = vim.api.nvim_get_runtime_file('', true),
-					},
-					-- Do not send telemetry data containing a randomized but unique identifier
-					telemetry = {
-						enable = false,
-					},
-				},
+	handlers = {
+		function(server_name)
+			require('lspconfig')[server_name].setup {
+				capabilities = get_generic_lsp_capabilites(),
+				on_attach = on_buffer_attach_to_lsp_server,
+				settings = servers[server_name],
+				filetypes = (servers[server_name] or {}).filetypes,
 			}
-		}
-	end,
+		end,
+		['jdtls'] = function()
+		end,
+		['lua_ls'] = function()
+			require('lspconfig').lua_ls.setup {
+				capabilities = get_generic_lsp_capabilites(),
+				on_attach = on_buffer_attach_to_lsp_server,
+				settings = {
+					Lua = {
+						runtime = {
+							-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+							version = 'LuaJIT',
+						},
+						workspace = {
+							-- Make the server aware of Neovim runtime files
+							library = vim.api.nvim_get_runtime_file('', true),
+						},
+						-- Do not send telemetry data containing a randomized but unique identifier
+						telemetry = {
+							enable = false,
+						},
+					},
+				}
+			}
+		end,
+	},
 }
