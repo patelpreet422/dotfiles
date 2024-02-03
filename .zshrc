@@ -67,6 +67,10 @@ zplug load
 [ ! -e "~/.zfunc/_kind" ] &&  kind completion zsh > ~/.zfunc/_kind
 # kind completion zsh > $~/.zfunc/_kind
 
+# minikube completion
+[ ! -e "~/.zfunc/_minikube" ] &&  minikube completion zsh > ~/.zfunc/_minikube
+# minikube completion zsh > $~/.zfunc/_minikube
+
 # k9s completion
 [ ! -e "~/.zfunc/_k9s" ] &&  k9s completion zsh > ~/.zfunc/_k9s
 # k9s completion zsh > ~/.zfunc/_k9s
@@ -76,14 +80,13 @@ zplug load
 # opa completion zsh > ~/.zfunc/_opa
 
 # aws completion
-if [[ -e "$(brew --prefix)/bin/aws_completer" ]] then
+if type brew &>/dev/null && [[ -e "$(brew --prefix)/bin/aws_completer" ]] then
   complete -C "$(brew --prefix)/bin/aws_completer" aws
   complete -C "$(brew --prefix)/bin/aws_completer" awspersonal
 elif [[ -e "/usr/local/bin/aws_completer" ]] then
   complete -C '/usr/local/bin/aws_completer' aws
   complete -C '/usr/local/bin/aws_completer' awspersonal
 fi
-
 
 # pipx completion
 eval "$(register-python-argcomplete pipx)"
@@ -132,13 +135,14 @@ bindkey -M menuselect 'k' vi-up-line-or-history
 bindkey -M menuselect 'l' vi-forward-char
 bindkey -M menuselect 'j' vi-down-line-or-history
 
+# nvm
+source /usr/share/nvm/init-nvm.sh
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
-export PATH="/opt/homebrew/opt/node@18/bin:$PATH"
 
 # bun completions
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
