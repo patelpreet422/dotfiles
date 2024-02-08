@@ -7,7 +7,7 @@ local lspconfig = require('lsp-config')
 
 -- list of nvim-lspconfig servers to install
 -- :lua P(require('mason-lspconfig').get_installed_servers())
-local servers = { 'gopls', 'lemminx', 'jsonls', 'lua_ls' }
+local servers = { 'gopls', 'lemminx', 'jsonls', 'lua_ls', 'jdtls' }
 
 
 -- see :help mason-lspconfig-introduction

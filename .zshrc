@@ -112,7 +112,9 @@ alias gr="git remote"
 export MANROFFOPT="-c"
 export FZF_ALT_C_COMMAND="fd"
 
+# to use this install fzf from github https://github.com/junegunn/fzf?tab=readme-ov-file#using-git
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
 # Preview file content using bat (https://github.com/sharkdp/bat)
 export FZF_CTRL_T_OPTS="
 --preview 'bat -n --color=always {}'
@@ -135,14 +137,21 @@ bindkey -M menuselect 'k' vi-up-line-or-history
 bindkey -M menuselect 'l' vi-forward-char
 bindkey -M menuselect 'j' vi-down-line-or-history
 
-# nvm
-source /usr/share/nvm/init-nvm.sh
 
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+if type brew &>/dev/null && [[ -e $(brew --prefix)/bin/nvm ]] then
+  [ -s $(brew --prefix)/opt/nvm/nvm.sh ] && \. $(brew --prefix)/opt/nvm/nvm.sh  # This loads nvm
+  [ -s $(brew --prefix)/opt/nvm/etc/bash_completion.d/nvm ] && \. $(brew --prefix)/opt/nvm/etc/bash_completion.d/nvm  # This loads nvm bash_completion
+else
+  # nvm init for Linux
+  [ -e /usr/share/nvm/init-nvm.sh ] && source /usr/share/nvm/init-nvm.sh
+
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+fi
+
+[ -e "${HOME}/.iterm2_shell_integration.zsh" ] && source "${HOME}/.iterm2_shell_integration.zsh"
 
 # bun completions
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
