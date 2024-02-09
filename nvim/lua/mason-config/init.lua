@@ -7,6 +7,7 @@ local lspconfig = require('lsp-config')
 
 -- list of nvim-lspconfig servers to install
 -- :lua P(require('mason-lspconfig').get_installed_servers())
+-- must install java-debug-adapter and java-test via mason if jdtls is installed is not working properly
 local servers = { 'gopls', 'lemminx', 'jsonls', 'lua_ls', 'jdtls' }
 
 

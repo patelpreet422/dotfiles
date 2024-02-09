@@ -9,7 +9,8 @@ extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
 
 local workspace_dir = require("lspconfig.server_configurations.jdtls").default_config.init_options.workspace
 local launcher = vim.fn.expand(
-  "~/.local/share/nvim/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_1.6.600.v20231106-1826.jar")
+  "~/.local/share/nvim/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_1.6.700.v20231214-2017.jar")
+
 local lombok_jar = vim.fn.expand("~/.local/share/nvim/mason/packages/jdtls/lombok.jar")
 
 local os_config = vim.fn.expand("~/.local/share/nvim/mason/packages/jdtls/config_mac_arm")
