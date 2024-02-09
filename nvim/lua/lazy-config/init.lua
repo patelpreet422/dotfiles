@@ -34,6 +34,17 @@ require('lazy').setup({
     event = 'BufEnter'
   },
 
+  -- Easy way to manage terminate
+  {
+    'akinsho/toggleterm.nvim',
+    opts = {
+      open_mapping = [[<c-\>]],
+      direction = 'float',
+      border = 'curved',
+      title_pos = 'center',
+    },
+  },
+
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
 
