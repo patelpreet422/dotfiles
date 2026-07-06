@@ -7,9 +7,14 @@ capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 local extendedClientCapabilities = jdtls.extendedClientCapabilities
 extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
 
-local workspace_dir = require("lspconfig.server_configurations.jdtls").default_config.init_options.workspace
-local launcher = vim.fn.expand(
-  "~/.local/share/nvim/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_1.6.700.v20231214-2017.jar")
+-- Shared jdtls data workspace dir. Previously read from nvim-lspconfig's default
+-- jdtls config; newer lspconfig no longer ships that module. Same value as before:
+-- $XDG_CACHE_HOME (or ~/.cache) + /jdtls/workspace.
+local workspace_dir = (os.getenv("XDG_CACHE_HOME") or (vim.uv.os_homedir() .. "/.cache")) .. "/jdtls/workspace"
+-- Glob the launcher jar so its version (which changes when mason updates jdtls)
+-- doesn't need to be hardcoded.
+local launcher = vim.fn.glob(
+  "~/.local/share/nvim/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_*.jar")
 
 local lombok_jar = vim.fn.expand("~/.local/share/nvim/mason/packages/jdtls/lombok.jar")
 
@@ -35,7 +40,7 @@ end
 local bundles = get_bundles()
 
 local on_buffer_attach_to_jdtls = function(_, bufnr)
-  vim.lsp.codelens.refresh()
+  vim.lsp.codelens.enable(true, { bufnr = bufnr })
   jdtls.setup_dap { hotcodereplace = "auto" }
   require("jdtls.dap").setup_dap_main_class_configs()
 
@@ -48,8 +53,9 @@ local on_buffer_attach_to_jdtls = function(_, bufnr)
 
   -- Register keymappings
   local wk = require "which-key"
-  local keys = { mode = { "n", "v" }, ["<leader>lj"] = { name = "+Java" } }
-  wk.register(keys)
+  wk.add {
+    { "<leader>lj", group = "+Java", mode = { "n", "v" } },
+  }
 
   map("n", "<leader>ljo", jdtls.organize_imports, "Organize Imports")
   map("n", "<leader>ljv", jdtls.extract_variable, "Extract Variable")
@@ -91,7 +97,7 @@ local on_buffer_attach_to_jdtls = function(_, bufnr)
   vim.api.nvim_create_autocmd("BufWritePost", {
     pattern = { "*.java" },
     callback = function()
-      local _, _ = pcall(vim.lsp.codelens.refresh)
+      pcall(vim.lsp.codelens.enable, true, { bufnr = 0 })
     end,
   })
 end

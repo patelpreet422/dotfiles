@@ -51,21 +51,33 @@ local default_client_capabilitites = function()
 	return capabilities
 end
 
-M.noop_handler = function()
+-- Apply our on-attach keymaps to every LSP buffer via a single LspAttach
+-- autocmd. This replaces the old per-server `on_attach`, since mason-lspconfig
+-- v2 removed the `handlers` setup API. jdtls is skipped here because
+-- after/ftplugin/java.lua registers its own (Java-specific) keymaps.
+M.setup_lsp_attach = function()
+	vim.api.nvim_create_autocmd('LspAttach', {
+		group = vim.api.nvim_create_augroup('user-lsp-attach', { clear = true }),
+		callback = function(event)
+			local client = vim.lsp.get_client_by_id(event.data.client_id)
+			if client and client.name == 'jdtls' then
+				return
+			end
+			default_buffer_attach_callback_handler(client, event.buf)
+		end,
+	})
 end
 
-M.default_lsp_handler = function(server_name)
-	require('lspconfig')[server_name].setup {
+-- Broadcast nvim-cmp capabilities to every server and keep our custom lua_ls
+-- settings, using the native vim.lsp.config API that mason-lspconfig v2 uses
+-- when it enables installed servers via vim.lsp.enable().
+M.configure_servers = function()
+	vim.lsp.config('*', {
 		capabilities = default_client_capabilitites(),
-		on_attach = default_buffer_attach_callback_handler,
-	}
-end
+	})
 
-M.lua_lsp_handler = function(server)
-	require('lspconfig').lua_ls.setup {
-		capabilities = default_client_capabilitites(),
-		on_attach = default_buffer_attach_callback_handler,
-		settings = server.settings or {
+	vim.lsp.config('lua_ls', {
+		settings = {
 			Lua = {
 				runtime = {
 					-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
@@ -80,8 +92,8 @@ M.lua_lsp_handler = function(server)
 					enable = false,
 				},
 			},
-		}
-	}
+		},
+	})
 end
 
 return M

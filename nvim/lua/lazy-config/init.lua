@@ -107,7 +107,7 @@ require('lazy').setup({
       'rafamadriz/friendly-snippets',
 
       -- Adds file path completion
-      '/hrsh7th/cmp-path'
+      'hrsh7th/cmp-path'
     },
   },
 
@@ -226,4 +226,8 @@ require('lazy').setup({
     build = ':TSUpdate',
   },
 
+}, {
+  -- No plugin here uses luarocks/rockspec; disabling avoids a false-positive
+  -- luarocks health error from newer lazy.nvim (it otherwise probes hererocks).
+  rocks = { enabled = false },
 })
