@@ -29,6 +29,10 @@ export PATH="$PATH:$HOME/bin"
 export PATH="$PATH:$HOME/flutter/bin"
 export PATH="$PATH:$HOME/.yarn/bin"
 export PATH="$PATH:$HOME/bear/bin:$HOME/bear/libexec:$HOME/bear/libexec/wrapper.d"
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
 export MANPAGER="sh -c 'col -bx | bat -l man -p --theme Monokai\ Extended\ Bright'"
 MANROFFOPT="-c"
 export FZF_DEFAULT_COMMAND="fd"
@@ -163,3 +167,10 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+# Created by `pipx` on 2025-01-18 12:12:28
+export PATH="$PATH:/Users/preet/.local/bin"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/preet/.lmstudio/bin"
+
